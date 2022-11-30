@@ -9,3 +9,6 @@ class DialogBase(QDialog):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
+
+
+__all__ = ["DialogBase"]

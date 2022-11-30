@@ -1,16 +1,14 @@
 # coding: utf-8
 
-from typing import Optional, Sequence
-import logging
 import json
 import os
 
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from .widgets.MenuButton import MenuButton
+from zui.ImageButton import ImageButton
 from .command import get_command_manager
-from .WindowManager import get_window_manager
+from .WindowManager import set_main_window
 
 
 class MenuData(object):
@@ -38,12 +36,12 @@ class MainWindow(QMainWindow):
         self.centralWidget = QWidget(self)
         self.setCentralWidget(self.centralWidget)
 
-        self.menus: list[MenuButton] = []
+        self.menus: list[ImageButton] = []
         self.menu_layout = QHBoxLayout()
         menus = load_menu_configuration()
         for menu in menus:
-            button = MenuButton(menu.menu_id, menu.name, menu.icon, menu.tooltip, parent=self)
-            button.triggered.connect(self._on_menu_triggered)
+            button = ImageButton(menu.menu_id, menu.name, menu.icon, menu.tooltip, parent=self)
+            button.clicked.connect(self._on_menu_triggered)
             self.menus.append(button)
             self.menu_layout.addWidget(button)
         self.menu_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
@@ -56,7 +54,7 @@ class MainWindow(QMainWindow):
 
         self.centralWidget.setLayout(self.main_layout)
 
-        get_window_manager().register_main_window(self)
+        set_main_window(self)
 
     @Slot(str)
     def _on_menu_triggered(self, menu_id: str):

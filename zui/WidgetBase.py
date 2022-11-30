@@ -17,3 +17,6 @@ class WidgetBase(QWidget):
         painter = QPainter(self)
         style: QStyle = self.style()
         style.drawPrimitive(QStyle.PrimitiveElement.PE_Widget, opt, painter, self)
+
+
+__all__ = ["WidgetBase"]

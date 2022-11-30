@@ -5,12 +5,12 @@ from enum import Enum
 from typing import Optional
 
 
-class SolutionConfiguration(Enum):
+class CompilationConfiguration(Enum):
     """C++ solution configuration.
     """
-    Debug = 1
-    Release = 2
-    QDebug = 3
+    Debug = 0
+    Release = 1
+    QDebug = 2
 
 
 class Repository(object):
@@ -54,3 +54,8 @@ class PathType(Enum):
     """
     Local = 1       # 本地路径
     Remote = 2      # FTP 路径
+
+
+class EnvironmentType(Enum):
+
+    QA = 0

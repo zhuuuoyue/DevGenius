@@ -1,28 +1,17 @@
 # coding: utf-8
 
-from typing import Union, Dict
+from typing import Union
 
-from PySide6.QtWidgets import QMainWindow, QWidget
-
-
-class WindowManager(object):
-
-    def __init__(self):
-        self.main_window:  Union[QMainWindow, None] = None
-        self.dialogs: Dict[str, QWidget] = {}
-
-    def register_main_window(self, win: QMainWindow) -> None:
-        self.main_window = win
-
-    def get_main_window(self) -> Union[QMainWindow, None]:
-        return self.main_window
-
-    def register_dialog(self, name: str, widget: QWidget) -> None:
-        pass
+from PySide6.QtWidgets import QMainWindow
 
 
-_window_manager = WindowManager()
+_main_window: Union[QMainWindow, None] = None
 
 
-def get_window_manager():
-    return _window_manager
+def set_main_window(win: Union[QMainWindow, None]) -> None:
+    global _main_window
+    _main_window = win
+
+
+def get_main_window() -> Union[QMainWindow, None]:
+    return _main_window

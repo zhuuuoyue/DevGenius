@@ -1,40 +1,50 @@
 # coding: utf-8
 
+import os
 from typing import Optional, Any
-from abc import ABC, abstractmethod
 
-from PySide6.QtCore import Qt, QSize, Slot, Signal, QModelIndex
-from PySide6.QtWidgets import QWidget, QPushButton, QLineEdit, QListWidget, QLabel,\
+from PySide6.QtCore import Slot, Signal, QModelIndex
+from PySide6.QtWidgets import QWidget, QLabel,\
     QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from .WidgetBase import WidgetBase
+from .IconButton import IconButton
+from .AdvancedList import AdvancedList, ListItemFilter
+from .CustomList import ListItemFormatter, CustomList
+from .SearchBar import SearchBar
 
 
-class AdvListUI(object):
+class StatusBar(QLabel):
+
+    def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
+        super().__init__(parent=parent, *args, **kwargs)
+
+    def update_text(self, total: int, searched: Optional[int] = None) -> None:
+        text = f"{total} item(s)"
+        if searched is not None:
+            text = f"{total} item(s), {searched} searched"
+        self.setText(text)
+
+
+class EditableListUI(object):
 
     def __init__(self, owner: QWidget):
         self.button_layout = QHBoxLayout()
-        self.add_button = QPushButton(parent=owner)
-        self._init_button(self.add_button, u"A", u"添加")
-        self.delete_button = QPushButton(parent=owner)
-        self._init_button(self.delete_button, u"D", u"删除")
-        self.edit_button = QPushButton(parent=owner)
-        self._init_button(self.edit_button, u"M", u"修改")
+        self.add_button = self.create_button(button_id="add", icon="add.png", parent=owner, tooltip=u"添加")
+        self.delete_button = self.create_button(button_id="delete", icon="bin.png", parent=owner, tooltip=u"删除")
+        self.edit_button = self.create_button(button_id="edit", icon="edit.png", parent=owner, tooltip=u"修改")
         self.button_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.button_layout.addSpacerItem(self.button_spacer)
 
         self.search_layout = QHBoxLayout()
-        self.keyword_input = QLineEdit(parent=owner)
-        self.keyword_input.setPlaceholderText(u"输入关键字，开始搜索 ...")
-        self.keyword_input.setClearButtonEnabled(True)
-        self.search_layout.addWidget(self.keyword_input)
+        self.search_bar = SearchBar(parent=owner)
+        self.search_layout.addWidget(self.search_bar)
 
         self.list_layout = QHBoxLayout()
-        self.list = QListWidget(parent=owner)
+        self.list = CustomList(parent=owner)
         self.list_layout.addWidget(self.list)
 
         self.status_layout = QHBoxLayout()
-        self.status_label = QLabel(parent=owner)
+        self.status_label = StatusBar(parent=owner)
         self.status_layout.addWidget(self.status_label)
 
         self.layout = QVBoxLayout()
@@ -45,37 +55,13 @@ class AdvListUI(object):
 
         owner.setLayout(self.layout)
 
-    def _init_button(self, button: QPushButton, text: str, tooltip: str = None):
-        button.setText(text)
-        if tooltip is not None:
-            button.setToolTip(tooltip)
-        button.setFixedSize(QSize(24, 24))
-        button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    def create_button(self, button_id: str, icon: str, tooltip: Optional[str] = None, parent: Optional[QWidget] = None):
+        button = IconButton(button_id=button_id, icon=f"{os.getcwd()}\\assets\\{icon}", tooltip=tooltip, parent=parent)
         self.button_layout.addWidget(button)
+        return button
 
 
-class AdvListItemFormatter(ABC):
-
-    @abstractmethod
-    def format(self, item: Any, items: list[Any] = None, index: Optional[int] = None) -> str:
-        pass
-
-
-class AdvListItemSorter(ABC):
-
-    @abstractmethod
-    def run(self, lhs: Any, rhs: Any) -> bool:
-        pass
-
-
-class AdvListItemFilter(ABC):
-
-    @abstractmethod
-    def filter(self, item: Any, keyword: str, items: list[Any] = None, index: Optional[int] = None) -> bool:
-        pass
-
-
-class AdvList(WidgetBase):
+class EditableList(AdvancedList):
 
     add_clicked = Signal()
     delete_clicked = Signal()
@@ -84,42 +70,38 @@ class AdvList(WidgetBase):
 
     def __init__(self,
                  parent: Optional[QWidget] = None,
-                 formatter: AdvListItemFormatter = None,
-                 sorter: AdvListItemSorter = None,
-                 filter: AdvListItemFilter = None,
+                 item_formatter: ListItemFormatter = None,
+                 item_filter: ListItemFilter = None,
                  *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
-        self._ui = AdvListUI(self)
-        self._formatter = formatter
-        self._sorter = sorter
-        self._filter = filter
+        self._ui = EditableListUI(self)
+        self._formatter = item_formatter
+        self._filter = item_filter
         self._data: list[Any] = []
+
+        self._ui.list.formatter = item_formatter
 
         self._ui.add_button.clicked.connect(self._on_add_clicked)
         self._ui.delete_button.clicked.connect(self._on_delete_clicked)
         self._ui.edit_button.clicked.connect(self._on_edit_clicked)
-        self._ui.keyword_input.textChanged.connect(self._on_keyword_changed)
+        self._ui.search_bar.keyword_changed.connect(self._on_keyword_changed)
         self._ui.list.itemSelectionChanged.connect(self._on_selection_changed)
 
         self._update_status()
 
     def load_data(self, items: list[Any]) -> None:
-        if self._formatter is None:
-            return
         self._data = items
-        for index, item in enumerate(items):
-            text = self._formatter.format(item=item, items=items, index=index)
-            self._ui.list.addItem(text)
+        self._ui.list.load_data(items)
 
-    def get_selected_project(self) -> Optional[Any]:
+    def get_selected_items(self) -> list[Any]:
         indexes: list[QModelIndex] = self._ui.list.selectedIndexes()
-        selected = len(indexes)
-        if selected == 0 or selected >= len(self._data):
-            return
-        return self._data[indexes[0].row()]
+        result: list[Any] = []
+        for index in indexes:
+            result.append(self._data[index.row()])
+        return result
 
     def in_searching_mode(self):
-        return len(self._ui.keyword_input.text()) != 0
+        return self._ui.search_bar.in_searching_mode()
 
     def _start_searching(self):
         self._ui.add_button.setEnabled(False)
@@ -138,10 +120,9 @@ class AdvList(WidgetBase):
             for index in range(self._ui.list.count()):
                 if not self._ui.list.isRowHidden(index):
                     shown += 1
-            text = f"共 {len(self._data)} 项，搜索到 {shown} 项"
+            self._ui.status_label.update_text(len(self._data), shown)
         else:
-            text = f"共 {len(self._data)} 项"
-        self._ui.status_label.setText(text)
+            self._ui.status_label.update_text(len(self._data))
 
     @Slot()
     def _on_add_clicked(self):
@@ -172,3 +153,6 @@ class AdvList(WidgetBase):
     @Slot()
     def _on_selection_changed(self):
         self.selection_changed.emit()
+
+
+__all__ = ["EditableList"]
