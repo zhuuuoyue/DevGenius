@@ -29,7 +29,7 @@ class SwitchEnvironmentDialogUI(object):
 class SwitchEnvironmentDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(parent=parent, dialog_id="b402436b-8b70-4be5-b6d6-44e1a875e418", *args, **kwargs)
         self.setWindowTitle(u"Environment Management")
         self.setMinimumSize(QSize(600, 460))
 

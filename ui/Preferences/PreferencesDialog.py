@@ -11,6 +11,6 @@ from components import DialogBase
 class PreferencesDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent=parent)
+        super().__init__(parent=parent, dialog_id="83e4862a-504c-481d-8a56-ba976863236e")
         self.setWindowTitle(u"Preferences")
         self.setMinimumSize(QSize(600, 400))

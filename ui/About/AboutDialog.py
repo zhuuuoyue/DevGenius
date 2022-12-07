@@ -12,7 +12,7 @@ from components import DialogBase, ImageLabel
 class AboutDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(parent=parent, dialog_id="95ece05b-01df-49e7-abff-3e7fe1ed7418", *args, **kwargs)
         self.setWindowTitle(u"About")
         self.setFixedSize(QSize(600, 404))
 

@@ -74,7 +74,7 @@ class TaskManagementDialogUI(object):
 class TaskManagementDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent=parent)
+        super().__init__(parent=parent, dialog_id="043e4734-b9b1-4cdd-9356-7e227d5d2514")
         self.setWindowTitle(u"Task Management")
         self.setMinimumSize(QSize(600, 400))
         self.ui = TaskManagementDialogUI(self)

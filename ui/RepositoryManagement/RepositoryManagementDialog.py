@@ -35,7 +35,7 @@ class RepositoryManagementDialogUI(object):
 class RepositoryManagementDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
-        super().__init__(parent=parent, *args, **kwargs)
+        super().__init__(parent=parent, dialog_id="93aa2d30-6410-40b9-88b3-37d53f9e0d1a", *args, **kwargs)
         self.setWindowTitle(u"Repository Management")
         self.setMinimumSize(QSize(800, 600))
         self.ui = RepositoryManagementDialogUI(self)

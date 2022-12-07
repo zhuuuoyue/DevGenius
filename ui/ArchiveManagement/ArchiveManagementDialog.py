@@ -70,7 +70,7 @@ class ArchiveManagementDialogUI(object):
 class ArchiveManagementDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent=parent)
+        super().__init__(parent=parent, dialog_id="753017fe-41cd-49c7-8877-a737595ed4cc")
         self.setWindowTitle(u"Archive Management")
         self.setMinimumSize(QSize(600, 400))
         self.ui = ArchiveManagementDialogUI(self)

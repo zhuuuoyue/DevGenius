@@ -84,7 +84,7 @@ class CreateFilesDialogUI(object):
 class CreateFilesDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent=parent)
+        super().__init__(parent=parent, dialog_id="46d861c9-a8b7-440f-8a3f-929288551787")
         self.setWindowTitle(u"Create Files")
         self.setMinimumSize(QSize(600, 400))
         self.ui = CreateFilesDialogUI(self)
