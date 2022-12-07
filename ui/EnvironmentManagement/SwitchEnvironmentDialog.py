@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QSize, Slot
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from zui import DialogBase
+from components import DialogBase
 
 from .ProgramDirectorySelector import ProgramDirectorySelector
 from .EnvironmentSelector import EnvironmentSelector

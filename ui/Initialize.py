@@ -2,7 +2,7 @@
 
 from .command import get_command_manager
 
-from .ProjectManagement.ProjectCommand import ProjectCommand
+from .RepositoryManagement.RepositoryManagementCommand import RepositoryManagementCommand
 from .Tasks import TaskManagementCommand
 from .Packaging import PackagingCommand
 from .ArchiveManagement import ArchiveManagementCommand
@@ -14,7 +14,7 @@ from .About import AboutCommand
 
 def initialize_commands():
     cmd_mgr = get_command_manager()
-    cmd_mgr.register("project", ProjectCommand)
+    cmd_mgr.register("project", RepositoryManagementCommand)
     cmd_mgr.register("task", TaskManagementCommand)
     cmd_mgr.register("packaging", PackagingCommand)
     cmd_mgr.register("archive", ArchiveManagementCommand)

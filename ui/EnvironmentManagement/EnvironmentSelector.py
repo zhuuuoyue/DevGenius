@@ -6,7 +6,7 @@ from typing import Optional
 from PySide6.QtCore import QMargins
 from PySide6.QtWidgets import QWidget, QGroupBox, QHBoxLayout, QSpacerItem, QSizePolicy
 
-from zui import WidgetBase, ImageButton
+from components import WidgetBase, ImageButton
 
 
 class EnvironmentButton(ImageButton):

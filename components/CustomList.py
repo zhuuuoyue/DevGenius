@@ -26,7 +26,10 @@ class CustomList(QListWidget):
         super().__init__(parent=parent)
         self.formatter = formatter
 
-    def load_data(self, data: list[Any]):
+    def load_data(self, data: list[Any], keep_selection: Optional[bool] = None):
+        self.clearSelection()
+        while self.count():
+            self.takeItem(0)
         if self.formatter is not None:
             f = self.formatter
         else:

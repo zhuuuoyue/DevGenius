@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QMargins, Slot, Signal
 from PySide6.QtWidgets import QWidget, QHBoxLayout
 
-from zui import WidgetBase
+from components import WidgetBase
 
 from ..utils import get_configuration_name
 from .ProjectSelector import ProjectSelector

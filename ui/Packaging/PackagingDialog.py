@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QWidget
 
-from zui import DialogBase
+from components import DialogBase
 
 
 class PackagingDialog(DialogBase):

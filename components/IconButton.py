@@ -13,7 +13,7 @@ class IconButton(QPushButton):
     normal_size: int = 22
     large_size: int = 24
 
-    clicked = Signal(str)
+    triggered = Signal(str)
 
     def __init__(self, button_id: str, icon: str, tooltip: Optional[str] = None, size: Optional[int] = None,
                  parent: Optional[QWidget] = None, *args, **kwargs):
@@ -42,7 +42,7 @@ class IconButton(QPushButton):
 
     @Slot()
     def _on_clicked(self):
-        self.clicked.emit(self.button_id)
+        self.triggered.emit(self.button_id)
 
 
 __all__ = ["IconButton"]

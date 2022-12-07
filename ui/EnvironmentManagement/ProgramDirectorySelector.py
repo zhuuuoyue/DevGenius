@@ -5,7 +5,7 @@ from typing import Optional
 from PySide6.QtWidgets import QWidget, QRadioButton, QLineEdit, QGroupBox, QHBoxLayout, QVBoxLayout, QSpacerItem,\
     QSizePolicy
 
-from zui import WidgetBase
+from components import WidgetBase
 
 from ..widgets import OutputDirectorySelector
 

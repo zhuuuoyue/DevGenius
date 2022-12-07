@@ -5,7 +5,7 @@ from typing import Optional, Any
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QWidget, QGroupBox, QHBoxLayout, QVBoxLayout
 
-from zui import DialogBase, EditableList, ListItemFormatter, ListItemFilter
+from components import DialogBase, EditableList, ListItemFormatter, ListItemFilter
 
 
 class TaskFilter(ListItemFilter):

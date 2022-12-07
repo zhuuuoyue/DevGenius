@@ -6,7 +6,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (QWidget, QLabel, QLineEdit, QCheckBox, QTableWidget,
                                QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy)
 
-from zui import DialogBase, WidgetBase
+from components import DialogBase, WidgetBase
 
 
 class FilterWidgetUI(object):

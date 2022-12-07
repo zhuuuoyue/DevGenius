@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from zui import DialogBase, ImageLabel
+from components import DialogBase, ImageLabel
 
 
 class AboutDialog(DialogBase):

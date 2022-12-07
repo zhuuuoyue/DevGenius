@@ -6,7 +6,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QCheckBox, QLabel, QSpacerItem,
     QSizePolicy, QTabWidget, QTextEdit, QPushButton)
 
-from zui import DialogBase
+from components import DialogBase
 
 
 def create_title(title: str, parent: Optional[QWidget] = None) -> QLabel:

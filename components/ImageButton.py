@@ -6,7 +6,7 @@ from PySide6.QtGui import QPixmap, QMouseEvent
 from PySide6.QtCore import Qt, Signal, QSize
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 
-from zui.WidgetBase import WidgetBase
+from components.WidgetBase import WidgetBase
 
 
 class ImageButtonUI(object):

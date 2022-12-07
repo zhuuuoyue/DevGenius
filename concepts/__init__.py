@@ -3,6 +3,7 @@
 from uuid import uuid4, UUID
 from enum import Enum
 from typing import Optional
+from abc import ABC
 
 
 class CompilationConfiguration(Enum):
@@ -13,40 +14,51 @@ class CompilationConfiguration(Enum):
     QDebug = 2
 
 
-class Repository(object):
+class Identifiable(ABC):
+
+    def __init__(self, id_: int = -1):
+        self.__id = -1
+        self.id = id_
+
+    def get_id(self) -> int:
+        return self.__id
+
+    def set_id(self, id_: int) -> None:
+        if isinstance(id_, int):
+            self.__id = id_
+
+    id = property(get_id, set_id)
+
+
+class Repository(Identifiable):
     """Project repository information.
     """
 
-    def __init__(self, path: str, name: Optional[str] = None, repo_id: Optional[UUID] = None):
-        self._name = ""
-        self._path = ""
-        self._id = uuid4() if repo_id is None else repo_id
+    def __init__(self, name: str, path: str, id_: int = -1):
+        super().__init__(id_)
+        self.__name = ""
+        self.__path = ""
 
         self.name = name
         self.path = path
 
     def get_name(self) -> str:
-        return self._name
+        return self.__name
 
     def set_name(self, value: str) -> None:
         if isinstance(value, str):
-            self._name = value
+            self.__name = value
 
     name = property(get_name, set_name)
 
     def get_path(self) -> str:
-        return self._path
+        return self.__path
 
     def set_path(self, value: str) -> None:
         if isinstance(value, str):
-            self._path = value
+            self.__path = value
 
     path = property(get_path, set_path)
-
-    def get_id(self) -> UUID:
-        return self._id
-
-    id = property(get_id)
 
 
 class PathType(Enum):

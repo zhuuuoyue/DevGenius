@@ -1,14 +1,15 @@
 # coding: utf-8
 
-from typing import Optional
+from typing import Optional, Union
 
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QGroupBox
 
 from concepts import Repository
-from zui.WidgetBase import WidgetBase
+from bussiness import RepositoryUtils
+from components.WidgetBase import WidgetBase
 
 
-class ProjectInfoViewerUI(object):
+class RepositoryInfoViewerUI(object):
 
     def __init__(self, owner: QWidget, title_width: Optional[int] = None):
         if title_width is None:
@@ -29,6 +30,14 @@ class ProjectInfoViewerUI(object):
         self.path_input = QLineEdit(parent=owner)
         self.path_input.setDisabled(True)
         self.path_layout.addWidget(self.path_input)
+
+        self.solution_layout = QHBoxLayout()
+        self.solution_title = QLabel(text=u"Solution Directory", parent=owner)
+        self.solution_title.setFixedWidth(title_width)
+        self.solution_layout.addWidget(self.solution_title)
+        self.solution_input = QLineEdit(parent=owner)
+        self.solution_input.setDisabled(True)
+        self.solution_layout.addWidget(self.solution_input)
 
         self.debug_layout = QHBoxLayout()
         self.debug_title = QLabel(text=u"Debug Output Dir.", parent=owner)
@@ -57,6 +66,7 @@ class ProjectInfoViewerUI(object):
         self.inner_layout = QVBoxLayout()
         self.inner_layout.addLayout(self.name_layout)
         self.inner_layout.addLayout(self.path_layout)
+        self.inner_layout.addLayout(self.solution_layout)
         self.inner_layout.addLayout(self.debug_layout)
         self.inner_layout.addLayout(self.qdebug_layout)
         self.inner_layout.addLayout(self.release_layout)
@@ -71,19 +81,31 @@ class ProjectInfoViewerUI(object):
         owner.setLayout(self.outer_layout)
 
 
-class ProjectInfoViewer(WidgetBase):
+class RepositoryInfoViewer(WidgetBase):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
-        self.ui = ProjectInfoViewerUI(owner=self)
+        self.ui = RepositoryInfoViewerUI(owner=self)
 
-    def set_repository(self, repo: Repository) -> None:
+    def set_repository(self, repo: Union[Repository, None]) -> None:
         if isinstance(repo, Repository):
+            dirs = RepositoryUtils.get_repository_directories(repo)
             self.ui.name_input.setText(repo.name)
             self.ui.path_input.setText(repo.path)
+            self.ui.solution_input.setText(dirs["solution"])
+            self.ui.debug_input.setText(dirs["debug"])
+            self.ui.release_input.setText(dirs["release"])
+            self.ui.qdebug_input.setText(dirs["qdebug"])
         else:
-            self.ui.name_input.setText(u"")
-            self.ui.path_input.setText(u"")
+            self.clear()
+
+    def clear(self) -> None:
+        self.ui.name_input.setText(u"")
+        self.ui.path_input.setText(u"")
+        self.ui.solution_input.setText(u"")
+        self.ui.debug_input.setText(u"")
+        self.ui.release_input.setText(u"")
+        self.ui.qdebug_input.setText(u"")
 
 
-__all__ = ["ProjectInfoViewer"]
+__all__ = ["RepositoryInfoViewer"]

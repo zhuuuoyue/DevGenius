@@ -29,9 +29,13 @@ class EditableListUI(object):
 
     def __init__(self, owner: QWidget):
         self.button_layout = QHBoxLayout()
-        self.add_button = self.create_button(button_id="add", icon="add.png", parent=owner, tooltip=u"添加")
-        self.delete_button = self.create_button(button_id="delete", icon="bin.png", parent=owner, tooltip=u"删除")
-        self.edit_button = self.create_button(button_id="edit", icon="edit.png", parent=owner, tooltip=u"修改")
+        self.add_button = self.create_button(button_id="add", icon="add.png", parent=owner, tooltip=u"Add")
+        self.delete_button = self.create_button(button_id="delete", icon="bin.png", parent=owner,
+                                                tooltip=u"Delete the selected item(s)")
+        self.delete_button.setEnabled(False)
+        self.edit_button = self.create_button(button_id="edit", icon="edit.png", parent=owner,
+                                              tooltip=u"Edit the selected item(s)")
+        self.edit_button.setEnabled(False)
         self.button_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.button_layout.addSpacerItem(self.button_spacer)
 
@@ -81,9 +85,9 @@ class EditableList(AdvancedList):
 
         self._ui.list.formatter = item_formatter
 
-        self._ui.add_button.clicked.connect(self._on_add_clicked)
-        self._ui.delete_button.clicked.connect(self._on_delete_clicked)
-        self._ui.edit_button.clicked.connect(self._on_edit_clicked)
+        self._ui.add_button.triggered.connect(self._on_add_clicked)
+        self._ui.delete_button.triggered.connect(self._on_delete_clicked)
+        self._ui.edit_button.triggered.connect(self._on_edit_clicked)
         self._ui.search_bar.keyword_changed.connect(self._on_keyword_changed)
         self._ui.list.itemSelectionChanged.connect(self._on_selection_changed)
 
@@ -110,8 +114,13 @@ class EditableList(AdvancedList):
 
     def _end_searching(self):
         self._ui.add_button.setEnabled(True)
-        self._ui.delete_button.setEnabled(True)
-        self._ui.edit_button.setEnabled(True)
+        self._update_buttons()
+
+    def _update_buttons(self) -> None:
+        indexes: list[QModelIndex] = self._ui.list.selectedIndexes()
+        enabled = len(indexes) != 0
+        self._ui.delete_button.setEnabled(enabled)
+        self._ui.edit_button.setEnabled(enabled)
 
     def _update_status(self):
         searching = self.in_searching_mode()
@@ -126,15 +135,15 @@ class EditableList(AdvancedList):
 
     @Slot()
     def _on_add_clicked(self):
-        pass
+        self.add_clicked.emit()
 
     @Slot()
     def _on_delete_clicked(self):
-        pass
+        self.delete_clicked.emit()
 
     @Slot()
     def _on_edit_clicked(self):
-        pass
+        self.edit_clicked.emit()
 
     @Slot()
     def _on_keyword_changed(self, keyword: str):
@@ -152,6 +161,7 @@ class EditableList(AdvancedList):
 
     @Slot()
     def _on_selection_changed(self):
+        self._update_buttons()
         self.selection_changed.emit()
 
 

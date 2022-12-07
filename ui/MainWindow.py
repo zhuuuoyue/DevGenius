@@ -6,7 +6,7 @@ import os
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from zui.ImageButton import ImageButton
+from components.ImageButton import ImageButton
 from .command import get_command_manager
 from .WindowManager import set_main_window
 
