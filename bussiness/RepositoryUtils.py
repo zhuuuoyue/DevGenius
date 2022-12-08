@@ -71,8 +71,8 @@ def get_repository_directories(repo: concepts.Repository) -> Dict[str, str]:
     if isinstance(repo, concepts.Repository):
         root: str = repo.path
         if len(root) != 0:
-            result["solution"] = f"{root}\\bin\\projects"
-            result["debug"] = f"{root}\\bin\\debug"
-            result["release"] = f"{root}\\bin\\release"
-            result["qdebug"] = f"{root}\\bin\\qdebug"
+            result["solution"] = f"{root}\\bin\\X64BuildProject"
+            result["debug"] = f"{root}\\bin\\x64Debug"
+            result["release"] = f"{root}\\bin\\x64Release"
+            result["qdebug"] = f"{root}\\bin\\x64Q_Debug"
     return result
