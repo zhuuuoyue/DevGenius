@@ -5,6 +5,7 @@ from typing import Optional
 from PySide6.QtCore import Slot, QSize
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
+import concepts
 from components import DialogBase
 
 from .RepositoryList import RepositoryList
@@ -21,10 +22,10 @@ class RepositoryManagementDialogUI(object):
         self.layout.addWidget(self.project_list)
 
         self.right_layout = QVBoxLayout()
-        self.project_info_viewer = RepositoryInfoViewer(owner)
-        self.right_layout.addWidget(self.project_info_viewer)
-        self.repository_info_viewer = RepositoryGitInfoViewer(owner)
-        self.right_layout.addWidget(self.repository_info_viewer)
+        self.repository_viewer = RepositoryInfoViewer(owner)
+        self.right_layout.addWidget(self.repository_viewer)
+        self.branch_viewer = RepositoryGitInfoViewer(owner)
+        self.right_layout.addWidget(self.branch_viewer)
         self.spacer = QSpacerItem(0, 0, vData=QSizePolicy.Policy.Expanding)
         self.right_layout.addSpacerItem(self.spacer)
         self.layout.addLayout(self.right_layout)
@@ -46,9 +47,12 @@ class RepositoryManagementDialog(DialogBase):
     def _on_repository_changed(self):
         repos = self.ui.project_list.get_selected_items()
         if len(repos) != 0:
-            self.ui.project_info_viewer.set_repository(repos[0])
+            repo: concepts.Repository = repos[0]
+            self.ui.repository_viewer.set_repository(repo)
+            self.ui.branch_viewer.set_repository_root_path(repo.path)
         else:
-            self.ui.project_info_viewer.set_repository(None)
+            self.ui.repository_viewer.set_repository(None)
+            self.ui.branch_viewer.set_repository_root_path(None)
 
 
 __all__ = ["RepositoryManagementDialog"]

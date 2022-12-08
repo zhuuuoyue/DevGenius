@@ -1,6 +1,9 @@
 # coding: utf-8
 
+import os
 from typing import Optional, Dict
+
+import git
 
 import concepts
 import db
@@ -75,4 +78,17 @@ def get_repository_directories(repo: concepts.Repository) -> Dict[str, str]:
             result["debug"] = f"{root}\\bin\\x64Debug"
             result["release"] = f"{root}\\bin\\x64Release"
             result["qdebug"] = f"{root}\\bin\\x64Q_Debug"
+    return result
+
+
+def get_branches(repo_root: str) -> list[concepts.BranchInfo]:
+    if not os.path.isdir(f"{repo_root}\\.git"):
+        return []
+    result: list[concepts.BranchInfo] = []
+    repo = git.Repo(repo_root)
+    print(repo.head)
+    for branch in repo.branches:
+        result.append(concepts.BranchInfo(
+            name=branch.name,
+        ))
     return result
