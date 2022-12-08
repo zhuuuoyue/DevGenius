@@ -65,6 +65,7 @@ class DialogManager(object):
 class DialogBase(QDialog):
 
     __manager__ = DialogManager()
+    __default_position__: QPoint = QPoint(0, 0)
 
     def __init__(self, parent: Optional[QWidget] = None, dialog_id: Optional[str] = None, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
@@ -75,9 +76,18 @@ class DialogBase(QDialog):
                 self.move(DialogBase.__manager__.get_dialog_position(self.dialog_id))
                 self.resize(DialogBase.__manager__.get_dialog_size(self.dialog_id))
             else:
-                origin: QPoint = QPoint(0, 0)
-                DialogBase.__manager__.update_dialog_position(self.dialog_id, origin)
-                self.move(origin)
+                pos: QPoint = DialogBase.get_default_position()
+                DialogBase.__manager__.update_dialog_position(self.dialog_id, pos)
+                self.move(pos)
+
+    @staticmethod
+    def set_default_position(pos: QPoint) -> None:
+        if isinstance(pos, QPoint):
+            DialogBase.__default_position__ = pos
+
+    @staticmethod
+    def get_default_position() -> QPoint:
+        return DialogBase.__default_position__
 
     def get_dialog_id(self) -> Union[str, None]:
         return self.__dialog_id

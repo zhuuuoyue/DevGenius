@@ -3,10 +3,11 @@
 import json
 import os
 
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QPoint
+from PySide6.QtGui import QResizeEvent, QMoveEvent
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
 
-from components.ImageButton import ImageButton
+from components import DialogBase, ImageButton
 from .command import get_command_manager
 from .WindowManager import set_main_window
 
@@ -59,3 +60,14 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def _on_menu_triggered(self, menu_id: str):
         get_command_manager().run(menu_id)
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        self.__update_dialog_position()
+
+    def moveEvent(self, event: QMoveEvent) -> None:
+        self.__update_dialog_position()
+
+    def __update_dialog_position(self) -> None:
+        height: int = self.frameSize().height()
+        pos: QPoint = self.pos()
+        DialogBase.set_default_position(QPoint(pos.x(), pos.y() + height))
