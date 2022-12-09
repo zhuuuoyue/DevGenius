@@ -10,3 +10,4 @@ from .EditableList import *
 from .SearchBar import *
 from .ProgressBrowser import *
 from .ImageLabel import *
+from .PathLabel import *

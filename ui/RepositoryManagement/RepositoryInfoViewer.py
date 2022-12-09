@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEd
 
 from concepts import Repository
 from bussiness import RepositoryUtils
+from components import PathLabel, DirectoryPathValidator
 from components.WidgetBase import WidgetBase
 
 
@@ -14,6 +15,8 @@ class RepositoryInfoViewerUI(object):
     def __init__(self, owner: QWidget, title_width: Optional[int] = None):
         if title_width is None:
             title_width = 120
+
+        self.directory_validator = DirectoryPathValidator()
 
         self.name_layout = QHBoxLayout()
         self.name_title = QLabel(text=u"Name", parent=owner)
@@ -27,7 +30,7 @@ class RepositoryInfoViewerUI(object):
         self.path_title = QLabel(text=u"Root Path", parent=owner)
         self.path_title.setFixedWidth(title_width)
         self.path_layout.addWidget(self.path_title)
-        self.path_input = QLineEdit(parent=owner)
+        self.path_input = PathLabel(parent=owner, validator=self.directory_validator)
         self.path_input.setDisabled(True)
         self.path_layout.addWidget(self.path_input)
 
@@ -35,7 +38,7 @@ class RepositoryInfoViewerUI(object):
         self.solution_title = QLabel(text=u"Solution Directory", parent=owner)
         self.solution_title.setFixedWidth(title_width)
         self.solution_layout.addWidget(self.solution_title)
-        self.solution_input = QLineEdit(parent=owner)
+        self.solution_input = PathLabel(parent=owner, validator=self.directory_validator)
         self.solution_input.setDisabled(True)
         self.solution_layout.addWidget(self.solution_input)
 
@@ -43,7 +46,7 @@ class RepositoryInfoViewerUI(object):
         self.debug_title = QLabel(text=u"Debug Output Dir.", parent=owner)
         self.debug_title.setFixedWidth(title_width)
         self.debug_layout.addWidget(self.debug_title)
-        self.debug_input = QLineEdit(parent=owner)
+        self.debug_input = PathLabel(parent=owner, validator=self.directory_validator)
         self.debug_input.setDisabled(True)
         self.debug_layout.addWidget(self.debug_input)
 
@@ -51,7 +54,7 @@ class RepositoryInfoViewerUI(object):
         self.qdebug_title = QLabel(text=u"QDebug Output Dir.", parent=owner)
         self.qdebug_title.setFixedWidth(title_width)
         self.qdebug_layout.addWidget(self.qdebug_title)
-        self.qdebug_input = QLineEdit(parent=owner)
+        self.qdebug_input = PathLabel(parent=owner, validator=self.directory_validator)
         self.qdebug_input.setDisabled(True)
         self.qdebug_layout.addWidget(self.qdebug_input)
 
@@ -59,7 +62,7 @@ class RepositoryInfoViewerUI(object):
         self.release_title = QLabel(text=u"Release Output Dir.", parent=owner)
         self.release_title.setFixedWidth(title_width)
         self.release_layout.addWidget(self.release_title)
-        self.release_input = QLineEdit(parent=owner)
+        self.release_input = PathLabel(parent=owner, validator=self.directory_validator)
         self.release_input.setDisabled(True)
         self.release_layout.addWidget(self.release_input)
 
@@ -91,21 +94,21 @@ class RepositoryInfoViewer(WidgetBase):
         if isinstance(repo, Repository):
             dirs = RepositoryUtils.get_repository_directories(repo)
             self.ui.name_input.setText(repo.name)
-            self.ui.path_input.setText(repo.path)
-            self.ui.solution_input.setText(dirs["solution"])
-            self.ui.debug_input.setText(dirs["debug"])
-            self.ui.release_input.setText(dirs["release"])
-            self.ui.qdebug_input.setText(dirs["qdebug"])
+            self.ui.path_input.set_path(repo.path)
+            self.ui.solution_input.set_path(dirs["solution"])
+            self.ui.debug_input.set_path(dirs["debug"])
+            self.ui.release_input.set_path(dirs["release"])
+            self.ui.qdebug_input.set_path(dirs["qdebug"])
         else:
             self.clear()
 
     def clear(self) -> None:
         self.ui.name_input.setText(u"")
-        self.ui.path_input.setText(u"")
-        self.ui.solution_input.setText(u"")
-        self.ui.debug_input.setText(u"")
-        self.ui.release_input.setText(u"")
-        self.ui.qdebug_input.setText(u"")
+        self.ui.path_input.set_path(None)
+        self.ui.solution_input.set_path(None)
+        self.ui.debug_input.set_path(None)
+        self.ui.release_input.set_path(None)
+        self.ui.qdebug_input.set_path(None)
 
 
 __all__ = ["RepositoryInfoViewer"]
