@@ -3,7 +3,7 @@
 from typing import Optional, Dict, Union
 
 from PySide6.QtCore import QSize, QPoint, QRect
-from PySide6.QtGui import QMoveEvent, QResizeEvent
+from PySide6.QtGui import QMoveEvent, QResizeEvent, QGuiApplication, QScreen
 from PySide6.QtWidgets import QWidget, QDialog
 
 
@@ -83,6 +83,17 @@ class DialogBase(QDialog):
     @staticmethod
     def set_default_position(pos: QPoint) -> None:
         if isinstance(pos, QPoint):
+            scrs: list[QScreen] = QGuiApplication.screens()
+            max_x: int = 0
+            max_y: int = 0
+            for scr in scrs:
+                center: QPoint = scr.geometry().center()
+                if center.x() > max_x:
+                    max_x = center.x()
+                if center.y() > max_y:
+                    max_y = center.y()
+            if pos.x() > max_x or pos.y() > max_y:
+                pos = QPoint(0, 0)
             DialogBase.__default_position__ = pos
 
     @staticmethod
