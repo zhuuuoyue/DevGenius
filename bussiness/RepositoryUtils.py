@@ -1,7 +1,7 @@
 # coding: utf-8
 
 import os
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 
 import git
 
@@ -81,14 +81,29 @@ def get_repository_directories(repo: concepts.Repository) -> Dict[str, str]:
     return result
 
 
-def get_branches(repo_root: str) -> list[concepts.BranchInfo]:
-    if not os.path.isdir(f"{repo_root}\\.git"):
+def get_repository(directory: str) -> Union[git.Repo, None]:
+    if not os.path.isdir(f"{directory}\\.git"):
+        return None
+    return git.Repo(directory)
+
+
+def get_branches(directory: str) -> list[concepts.BranchInfo]:
+    repo = get_repository(directory)
+    if repo is None:
         return []
     result: list[concepts.BranchInfo] = []
-    repo = git.Repo(repo_root)
-    print(repo.head)
-    for branch in repo.branches:
+    branches: list[git.Head] = repo.branches
+    for branch in branches:
+        tracking_branch: Union[git.RemoteReference, None] = branch.tracking_branch()
         result.append(concepts.BranchInfo(
             name=branch.name,
+            remote_name=(None if tracking_branch is None else tracking_branch.name)
         ))
     return result
+
+
+def get_untracked_files(directory: str) -> list[str]:
+    repo = get_repository(directory)
+    if repo is None:
+        return []
+    return repo.untracked_files

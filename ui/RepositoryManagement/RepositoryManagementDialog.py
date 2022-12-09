@@ -10,7 +10,8 @@ from components import DialogBase
 
 from .RepositoryList import RepositoryList
 from .RepositoryInfoViewer import RepositoryInfoViewer
-from .RepositoryGitInfoViewer import RepositoryGitInfoViewer
+from .BranchInfoViewer import BranchInfoViewer
+from .UntrackedFileViewer import UntrackedFileViewer
 
 
 class RepositoryManagementDialogUI(object):
@@ -22,14 +23,20 @@ class RepositoryManagementDialogUI(object):
         self.layout.addWidget(self.project_list)
 
         self.right_layout = QVBoxLayout()
+
         self.repository_viewer = RepositoryInfoViewer(owner)
         self.right_layout.addWidget(self.repository_viewer)
-        self.branch_viewer = RepositoryGitInfoViewer(owner)
+
+        self.branch_viewer = BranchInfoViewer(owner)
         self.right_layout.addWidget(self.branch_viewer)
+
+        self.untracked_file_viewer = UntrackedFileViewer(owner)
+        self.right_layout.addWidget(self.untracked_file_viewer)
+
         self.spacer = QSpacerItem(0, 0, vData=QSizePolicy.Policy.Expanding)
         self.right_layout.addSpacerItem(self.spacer)
-        self.layout.addLayout(self.right_layout)
 
+        self.layout.addLayout(self.right_layout)
         owner.setLayout(self.layout)
 
 
@@ -49,10 +56,12 @@ class RepositoryManagementDialog(DialogBase):
         if len(repos) != 0:
             repo: concepts.Repository = repos[0]
             self.ui.repository_viewer.set_repository(repo)
-            self.ui.branch_viewer.set_repository_root_path(repo.path)
+            self.ui.branch_viewer.set_repository_directory(repo.path)
+            self.ui.untracked_file_viewer.set_repository_directory(repo.path)
         else:
             self.ui.repository_viewer.set_repository(None)
-            self.ui.branch_viewer.set_repository_root_path(None)
+            self.ui.branch_viewer.set_repository_directory(None)
+            self.ui.untracked_file_viewer.set_repository_directory(None)
 
 
 __all__ = ["RepositoryManagementDialog"]

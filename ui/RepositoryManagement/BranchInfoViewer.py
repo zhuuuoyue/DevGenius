@@ -59,7 +59,7 @@ class BranchTable(QTableWidget):
             self.append_row(branch)
 
 
-class RepositoryGitInfoViewerUI(object):
+class BranchInfoViewerUI(object):
 
     def __init__(self, owner: QWidget):
         self.table = BranchTable(parent=owner)
@@ -68,7 +68,7 @@ class RepositoryGitInfoViewerUI(object):
         self.table_layout.addWidget(self.table)
 
         self.group_box = QGroupBox(parent=owner)
-        self.group_box.setTitle(u"Git Basic Information")
+        self.group_box.setTitle(u"Branches")
         self.group_box.setLayout(self.table_layout)
 
         self.layout = QHBoxLayout()
@@ -77,15 +77,15 @@ class RepositoryGitInfoViewerUI(object):
         owner.setLayout(self.layout)
 
 
-class RepositoryGitInfoViewer(WidgetBase):
+class BranchInfoViewer(WidgetBase):
 
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
         super().__init__(parent=parent, *args, **kwargs)
-        self.__ui = RepositoryGitInfoViewerUI(self)
+        self.__ui = BranchInfoViewerUI(self)
 
-    def set_repository_root_path(self, root: Union[str, None]) -> None:
+    def set_repository_directory(self, root: Union[str, None]) -> None:
         branches: list[BranchInfo] = RepositoryUtils.get_branches(root) if root is not None else []
         self.__ui.table.load_data(branches)
 
 
-__all__ = ["RepositoryGitInfoViewer"]
+__all__ = ["BranchInfoViewer"]
