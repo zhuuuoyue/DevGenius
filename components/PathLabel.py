@@ -62,4 +62,19 @@ class PathLabel(QLineEdit):
                 self.setStyleSheet("color: black;")
 
 
-__all__ = ["PathLabel", "PathValidator", "FilePathValidator", "DirectoryPathValidator"]
+def create_file_path_label(parent: Optional[QWidget] = None) -> PathLabel:
+    return PathLabel(parent=parent, validator=FilePathValidator())
+
+
+def create_directory_path_label(parent: Optional[QWidget] = None) -> PathLabel:
+    return PathLabel(parent=parent, validator=DirectoryPathValidator())
+
+
+__all__ = [
+    "PathLabel",
+    "create_file_path_label",
+    "create_directory_path_label",
+    "PathValidator",
+    "FilePathValidator",
+    "DirectoryPathValidator"
+]
