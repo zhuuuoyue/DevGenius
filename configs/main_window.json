@@ -1,0 +1,50 @@
+[
+  {
+    "id": "project",
+    "name": "Projects",
+    "icon": ".\\assets\\menu_icons\\tan_fu_ying.png",
+    "tooltip": ""
+  },
+  {
+    "id": "task",
+    "name": "Tasks",
+    "icon": ".\\assets\\menu_icons\\cheng_yan_qiu.png",
+    "tooltip": ""
+  },
+  {
+    "id": "packaging",
+    "name": "Packaging",
+    "icon": ".\\assets\\menu_icons\\mei_lan_fang.png",
+    "tooltip": ""
+  },
+  {
+    "id": "archive",
+    "name": "Archives",
+    "icon": ".\\assets\\menu_icons\\qiu_sheng_rong.png",
+    "tooltip": ""
+  },
+  {
+    "id": "create_files",
+    "name": "Create",
+    "icon": ".\\assets\\menu_icons\\li_he_zeng.png",
+    "tooltip": ""
+  },
+  {
+    "id": "environment",
+    "name": "Environments",
+    "icon": ".\\assets\\menu_icons\\zhang_jun_qiu.png",
+    "tooltip": ""
+  },
+  {
+    "id": "preferences",
+    "name": "Preferences",
+    "icon": ".\\assets\\menu_icons\\zhou_xin_fang.png",
+    "tooltip": ""
+  },
+  {
+    "id": "about",
+    "name": "About",
+    "icon": ".\\assets\\menu_icons\\ma_lian_liang.png",
+    "tooltip": ""
+  }
+]
