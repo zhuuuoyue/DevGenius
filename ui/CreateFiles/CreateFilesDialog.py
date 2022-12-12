@@ -5,16 +5,38 @@ from typing import Optional, Tuple, Union
 
 from PySide6.QtCore import QSize, Slot
 from PySide6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QCheckBox, QLabel, QSpacerItem,
-    QSizePolicy, QTabWidget, QTextEdit, QPushButton, QMessageBox)
+                               QSizePolicy, QTabWidget, QTextEdit, QPushButton, QMessageBox)
 
 from bussiness import CreationUtils
 from components import DialogBase
+
+
+__header_template__: str = """// Owner: 
+// Co-Owner: 
+
+#pragma once
+
+"""
+
+__source_template__: str = """// Owner: 
+// Co-Owner: 
+
+#include ".h"
+"""
 
 
 def create_title(title: str, parent: Optional[QWidget] = None) -> QLabel:
     widget = QLabel(text=title, parent=parent)
     widget.setFixedWidth(80)
     return widget
+
+
+class Setting(object):
+
+    def __init__(self):
+        self.directory = None
+        self.header = True
+        self.source = True
 
 
 class CreateFilesDialogUI(object):
@@ -36,28 +58,18 @@ class CreateFilesDialogUI(object):
         self.extension_title = create_title(u"File Types", parent=owner)
         self.extension_layout.addWidget(self.extension_title)
         self.header = QCheckBox(text=u"Header File (*.h)", parent=owner)
+        # self.header.setChecked(False)
         self.extension_layout.addWidget(self.header)
         self.source = QCheckBox(text=u"Source File (*.cpp)", parent=owner)
+        # self.source.setChecked(False)
         self.extension_layout.addWidget(self.source)
         self.extension_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.extension_layout.addSpacerItem(self.extension_spacer)
 
         self.preview = QTabWidget(parent=owner)
-        self.header_preview = QTextEdit(parent=owner)
-        self.header_preview.setText("""// Owner: 
-// Co-Owner: 
-
-#pragma once
-
-""")
+        self.header_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=__header_template__)
         self.preview.addTab(self.header_preview, u"Header")
-        self.source_preview = QTextEdit(parent=owner)
-        self.source_preview.setText("""// Owner: 
-// Co-Owner: 
-
-#include ".h"
-
-""")
+        self.source_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=__source_template__)
         self.preview.addTab(self.source_preview, u"Source")
 
         self.button_layout = QHBoxLayout()
@@ -80,8 +92,18 @@ class CreateFilesDialogUI(object):
 
         owner.setLayout(self.layout)
 
+    @staticmethod
+    def create_text_editor(parent: QWidget, content: str) -> QTextEdit:
+        editor: QTextEdit = QTextEdit(parent=parent)
+        editor.setText(content)
+        editor.setStyleSheet("""
+        font-family: Consolas;
+        """)
+        return editor
+
 
 class CreateFilesDialog(DialogBase):
+    __cache: Setting = Setting()
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent=parent, dialog_id="46d861c9-a8b7-440f-8a3f-929288551787")
@@ -89,12 +111,16 @@ class CreateFilesDialog(DialogBase):
         self.setMinimumSize(QSize(600, 400))
         self.ui = CreateFilesDialogUI(self)
 
+        self.__load_data(CreateFilesDialog.__cache)
+
         self.ui.folder.textChanged.connect(self.__on_path_changed)
         self.ui.basename.textChanged.connect(self.__on_path_changed)
         self.ui.header.stateChanged.connect(self.__on_file_types_changed)
         self.ui.source.stateChanged.connect(self.__on_file_types_changed)
         self.ui.create.clicked.connect(self.__on_create_clicked)
         self.ui.cancel.clicked.connect(self.__on_cancel_clicked)
+
+        self.__update_create_button_status()
 
     def __get_paths(self) -> Tuple[Union[str, None], Union[str, None]]:
         folder = self.ui.folder.text()
@@ -113,11 +139,13 @@ class CreateFilesDialog(DialogBase):
         self.ui.create.setEnabled(enabled)
 
     @Slot()
-    def __on_path_changed(self, text: str) -> None:
+    def __on_path_changed(self) -> None:
+        self.__save_data()
         self.__update_create_button_status()
 
     @Slot()
-    def __on_file_types_changed(self, sta) -> None:
+    def __on_file_types_changed(self) -> None:
+        self.__save_data()
         self.__update_create_button_status()
 
     @Slot()
@@ -148,3 +176,13 @@ class CreateFilesDialog(DialogBase):
     @Slot()
     def __on_cancel_clicked(self) -> None:
         self.reject()
+
+    def __load_data(self, data: Setting) -> None:
+        self.ui.folder.setText(data.directory)
+        self.ui.header.setChecked(data.header)
+        self.ui.source.setChecked(data.source)
+
+    def __save_data(self) -> None:
+        CreateFilesDialog.__cache.directory = self.ui.folder.text()
+        CreateFilesDialog.__cache.header = self.ui.header.isChecked()
+        CreateFilesDialog.__cache.source = self.ui.source.isChecked()
