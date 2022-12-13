@@ -2,6 +2,7 @@
 
 import os
 import re
+import datetime
 from typing import Union
 
 
@@ -29,11 +30,13 @@ def analysis_test_result(directory: str) -> Union[TestCase, None]:
                             line_number=int(matched.group(5)),
                             function=matched.group(6),
                             message=matched.group(7),
-                            author=matched.group(8)
+                            author=matched.group(8),
+                            date=datetime.date(int(matched.group(9)), int(matched.group(10)), int(matched.group(11)))
                         )
                         return TestCase(
                             name=os.path.basename(directory),
                             js_filename=item,
+                            directory=directory,
                             error=error_info
                         )
 

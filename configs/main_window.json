@@ -1,55 +1,55 @@
 [
   {
     "id": "project",
-    "name": "Projects",
+    "name": "仓库管理",
     "icon": ".\\assets\\menu_icons\\tan_fu_ying.png",
     "tooltip": ""
   },
   {
     "id": "task",
-    "name": "Tasks",
+    "name": "任务管理",
     "icon": ".\\assets\\menu_icons\\cheng_yan_qiu.png",
     "tooltip": ""
   },
   {
     "id": "packaging",
-    "name": "Packaging",
+    "name": "软件打包",
     "icon": ".\\assets\\menu_icons\\mei_lan_fang.png",
     "tooltip": ""
   },
   {
     "id": "archive",
-    "name": "Archives",
+    "name": "软件包管理",
     "icon": ".\\assets\\menu_icons\\qiu_sheng_rong.png",
     "tooltip": ""
   },
   {
     "id": "create_files",
-    "name": "Create",
+    "name": "创建文件",
     "icon": ".\\assets\\menu_icons\\li_he_zeng.png",
     "tooltip": ""
   },
   {
     "id": "environment",
-    "name": "Environments",
+    "name": "环境切换",
     "icon": ".\\assets\\menu_icons\\zhang_jun_qiu.png",
     "tooltip": ""
   },
   {
     "id": "analysis_test_result",
-    "name": "Test Result",
+    "name": "测试分析",
     "icon": ".\\assets\\menu_icons\\zhang_jun_qiu.png",
     "tooltip": ""
   },
   {
     "id": "preferences",
-    "name": "Preferences",
+    "name": "设置",
     "icon": ".\\assets\\menu_icons\\zhou_xin_fang.png",
     "tooltip": ""
   },
   {
     "id": "about",
-    "name": "About",
+    "name": "关于",
     "icon": ".\\assets\\menu_icons\\ma_lian_liang.png",
     "tooltip": ""
   }
