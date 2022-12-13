@@ -36,6 +36,12 @@
     "tooltip": ""
   },
   {
+    "id": "analysis_test_result",
+    "name": "Test Result",
+    "icon": ".\\assets\\menu_icons\\zhang_jun_qiu.png",
+    "tooltip": ""
+  },
+  {
     "id": "preferences",
     "name": "Preferences",
     "icon": ".\\assets\\menu_icons\\zhou_xin_fang.png",
