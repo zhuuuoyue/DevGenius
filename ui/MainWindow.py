@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__(None)
         self.move(0, 0)
-        self.setWindowTitle("DevGenius - Desktop")
+        self.setWindowTitle(u"开发精灵 - 桌面版")
         self.centralWidget = QWidget(self)
         self.setCentralWidget(self.centralWidget)
 

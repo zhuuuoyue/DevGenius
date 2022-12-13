@@ -17,13 +17,13 @@ class PathValidator(ABC):
 class FilePathValidator(PathValidator):
 
     def validate(self, path: str) -> bool:
-        return os.path.isfile(path)
+        return isinstance(path, str) and os.path.isfile(path)
 
 
 class DirectoryPathValidator(PathValidator):
 
     def validate(self, path: str) -> bool:
-        return os.path.isdir(path)
+        return isinstance(path, str) and os.path.isdir(path)
 
 
 class PathLabel(QLineEdit):

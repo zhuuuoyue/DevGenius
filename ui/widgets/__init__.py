@@ -3,3 +3,4 @@
 from .CompilationConfigurationSelector import CompilationConfigurationSelector
 from .ProjectSelector import ProjectSelector
 from .OutputDirectorySelector import OutputDirectorySelector
+from .OpenDirectoryButton import OpenDirectoryButton
