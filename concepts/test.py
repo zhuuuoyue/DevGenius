@@ -1,143 +1,123 @@
 # coding: utf-8
 
-from datetime import date as Date
+import datetime
+import os.path
+from enum import Enum
 from typing import Union, Optional
 
 
-class DbgWarnInfo(object):
+class TestCaseRunningStatus(Enum):
 
-    def __init__(self, task_id: Optional[int] = None, filename: Optional[str] = None, line_number: Optional[int] = None,
-                 function: Optional[str] = None, message: Optional[str] = None, author: Optional[str] = None,
-                 date: Optional[Date] = None):
-        self.__task_id = None
-        self.__filename = None
-        self.__line_number = None
-        self.__function = None
-        self.__message = None
-        self.__author = None
-        self.__date = None
+    Unknown = 0
+    Passed = 1
+    Failed = 2
 
-        self.task_id = task_id
-        self.filename = filename
-        self.line_number = line_number
-        self.function = function
-        self.message = message
-        self.author = author
-        self.date = date
 
-    def is_valid(self) -> bool:
-        pass
+class TestCaseRunningError(object):
 
-    def get_task_id(self) -> Union[int, None]:
-        return self.__task_id
-
-    def set_task_id(self, task_id: int) -> None:
-        if isinstance(task_id, int):
-            self.__task_id = task_id
-
-    task_id = property(get_task_id, set_task_id)
-
-    def get_filename(self) -> Union[str, None]:
-        return self.__filename
-
-    def set_filename(self, filename: Union[str, None]) -> None:
-        if filename is None or isinstance(filename, str):
-            self.__filename = filename
-
-    filename = property(get_filename, set_filename)
-
-    def get_line_number(self) -> Union[int, None]:
-        return self.__line_number
-
-    def set_line_number(self, line_number: Union[int, None]) -> None:
-        if line_number is None or isinstance(line_number, int):
-            self.__line_number = line_number
-
-    line_number = property(get_line_number, set_line_number)
-
-    def get_function(self) -> Union[str, None]:
-        return self.__function
-
-    def set_function(self, function: Union[str, None]) -> None:
-        if function is None or isinstance(function, str):
-            self.__function = function
-
-    function = property(get_function, set_function)
-
-    def get_message(self) -> Union[str, None]:
-        return self.__message
-
-    def set_message(self, message: Union[str, None]) -> None:
-        if message is None or isinstance(message, str):
-            self.__message = message
-
-    message = property(get_message, set_message)
-
-    def get_author(self) -> Union[str, None]:
-        return self.__author
-
-    def set_author(self, author: Union[str, None]) -> None:
-        if author is None or isinstance(author, str):
-            self.__author = author
-
-    author = property(get_author, set_author)
-
-    def get_date(self) -> Union[Date, None]:
-        return self.__date
-
-    def set_date(self, value: Union[Date, None]) -> None:
-        if value is None or isinstance(value, Date):
-            self.__date = value
-
-    date = property(get_date, set_date)
+    def __init__(self,
+                 name: Optional[str] = None,
+                 task_id: Optional[int] = None,
+                 filename: Optional[str] = None,
+                 line_number: Optional[int] = None,
+                 function: Optional[str] = None,
+                 message: Optional[str] = None,
+                 author: Optional[str] = None,
+                 date: Optional[datetime.date] = None,
+                 *args,
+                 **kwargs):
+        self.name: Union[str, None] = name
+        self.task_id: Union[int, None] = task_id
+        self.filename: Union[str, None] = filename
+        self.line_number: Union[int, None] = line_number
+        self.function: Union[str, None] = function
+        self.message: Union[str, None] = message
+        self.author: Union[str, None] = author
+        self.date: Union[datetime.date, None] = date
 
 
 class TestCase(object):
 
-    def __init__(self, name: Optional[str] = None, js_filename: Optional[str] = None, directory: Optional[str] = None,
-                 error: Optional[DbgWarnInfo] = None):
-        self.__name = None
-        self.__js_filename = None
-        self.__directory = None
-        self.__error = None
+    def __init__(self,
+                 group: Union[str] = None,
+                 name: Optional[str] = None,
+                 run_time_limited: Optional[int] = None,
+                 run_speed: Optional[int] = None,
+                 count: Optional[int] = None,
+                 debug_mode: Optional[str] = None,
+                 js_filename: Optional[str] = None,
+                 to_run: Optional[bool] = None,
+                 run_type: Optional[str] = None,
+                 exe_name: Optional[str] = None,
+                 depend_on_source: Optional[bool] = None,
+                 directory: Optional[str] = None,
+                 *args,
+                 **kwargs):
+        self.group: Union[str, None] = group
+        self.name: Union[str, None] = name
+        self.run_time_limited: Union[int, None] = run_time_limited
+        self.run_speed: Union[int, None] = run_speed
+        self.count: Union[int, None] = count
+        self.debug_mode: Union[str, None] = debug_mode
+        self.js_filename: Union[str, None] = js_filename
+        self.to_run: Union[bool, None] = to_run
+        self.run_type: Union[str, None] = run_type
+        self.exe_name: Union[str, None] = exe_name
+        self.depend_on_source: Union[bool, None] = depend_on_source
+        self.directory: Union[str, None] = directory
 
-        self.name = name
-        self.js_filename = js_filename
-        self.directory = directory
-        self.error = error
 
-    def get_name(self) -> Union[str, None]:
-        return self.__name
+class TestCaseRunningResult(object):
 
-    def set_name(self, name: Union[str, None]) -> None:
-        if name is None or isinstance(name, str):
-            self.__name = name
+    def __init__(self,
+                 status: Optional[str] = None,
+                 output_directory: Optional[str] = None,
+                 cost_seconds: Optional[float] = None,
+                 test_case: Optional[TestCase] = None,
+                 *args,
+                 **kwargs):
+        self.status: Union[str, None] = status
+        self.output_directory: Union[str, None] = output_directory
+        self.test_case: Union[TestCase, None] = test_case
+        self.cost_seconds: Union[float, None] = cost_seconds
+        self.error_info: Union[TestCaseRunningError, None] = None
 
-    name = property(get_name, set_name)
 
-    def get_js_filename(self) -> Union[str, None]:
-        return self.__js_filename
+class TestCaseRunningResultCollection(object):
 
-    def set_js_filename(self, js_filename: Union[str, None]) -> None:
-        if js_filename is None or isinstance(js_filename, str):
-            self.__js_filename = js_filename
+    def __init__(self):
+        self.__list: list[TestCaseRunningResult] = []
+        self.__map: dict[str, TestCaseRunningResult] = {}
 
-    js_filename = property(get_js_filename, set_js_filename)
+    def add_item(self, item: TestCaseRunningResult) -> bool:
+        if not isinstance(item, TestCaseRunningResult):
+            return False
+        if not isinstance(item.test_case, TestCase):
+            return False
+        name = item.test_case.name
+        basename, ext = os.path.splitext(name)
+        self.__list.append(item)
+        self.__map[basename] = item
+        return True
 
-    def get_directory(self) -> Union[str, None]:
-        return self.__directory
+    def get_item_by_name(self, name: str) -> Union[TestCaseRunningResult, None]:
+        if not isinstance(name, str):
+            return None
+        if name not in self.__map:
+            return None
+        return self.__map[name]
 
-    def set_directory(self, directory: Union[str, None]) -> None:
-        if directory is None or isinstance(directory, str):
-            self.__directory = directory
+    def get_item_by_index(self, index: int) -> Union[TestCaseRunningResult, None]:
+        if not isinstance(index, int):
+            return None
+        if index < 0 or index >= len(self.__list):
+            return None
+        return self.__list[index]
 
-    directory = property(get_directory, set_directory)
+    def get_count(self) -> int:
+        return len(self.__list)
 
-    def get_error(self) -> Union[DbgWarnInfo, None]:
-        return self.__error
+    def get_data(self) -> list[TestCaseRunningResult]:
+        return self.__list
 
-    def set_error(self, error: Union[DbgWarnInfo, None]) -> None:
-        if error is None or isinstance(error, DbgWarnInfo):
-            self.__error = error
-
-    error = property(get_error, set_error)
+    data = property(get_data)

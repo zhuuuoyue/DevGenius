@@ -7,8 +7,8 @@ from PySide6.QtCore import QSize, Slot, Signal, Qt, QItemSelection
 from PySide6.QtWidgets import QWidget, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout, QVBoxLayout, QLabel,\
     QLineEdit, QAbstractItemView
 
-from concepts.test import TestCase, DbgWarnInfo
-from bussiness.TestUtils import analysis_test_results
+from concepts.test import TestCase, TestCaseRunningError, TestCaseRunningResultCollection
+from bussiness.TestUtils import parse_test_results
 from components import DialogBase, PathLabel, DirectoryPathValidator
 
 from ..widgets import OpenDirectoryButton
@@ -16,8 +16,7 @@ from ..widgets import OpenDirectoryButton
 
 class TestResultTable(QTableWidget):
 
-    __columns: list[str] = [u"测试用例", u"脚本文件名", u"类型", u"任务 ID", u"文件名", u"行号", u"函数/方法", u"调试信息",
-                            u"作者", u"日期"]
+    __columns: list[str] = [u"结果", u"分组", u"文件名", u"错误描述", u"出错文件", u"行号", u"出错函数", u"作者"]
 
     selectedTestCaseChanged = Signal()
 
@@ -28,7 +27,7 @@ class TestResultTable(QTableWidget):
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
-        self.__data: list[TestCase] = []
+        self.__data: TestCaseRunningResultCollection = TestCaseRunningResultCollection()
 
         self.pressed.connect(self.__on_selection_changed)
 
@@ -37,33 +36,29 @@ class TestResultTable(QTableWidget):
             self.removeRow(0)
         self.__data = []
 
-    def load_data(self, items: list[TestCase]) -> None:
+    def load_data(self, items: TestCaseRunningResultCollection) -> None:
         self.__remove_all_rows()
         self.__data = items
-        self.setRowCount(len(self.__data))
-        for row, item in enumerate(self.__data):
-            self.__set_cell(row, 0, item.name)
-            self.__set_cell(row, 1, item.js_filename)
-            err = item.error
-            if err is None:
+        self.setRowCount(self.__data.get_count())
+        for row, item in enumerate(self.__data.data):
+            if item.test_case is None:
                 continue
-            self.__set_cell(row, 2, "")
-            self.__set_cell(row, 3, str(err.task_id))
-            self.__set_cell(row, 4, err.filename)
-            self.__set_cell(row, 5, str(err.line_number))
-            self.__set_cell(row, 6, err.function)
-            self.__set_cell(row, 7, err.message)
-            self.__set_cell(row, 8, err.author)
-            self.__set_cell(row, 9, err.date.isoformat())
+            self.__set_cell(row, 0, item.status)
+            self.__set_cell(row, 1, item.test_case.group)
+            self.__set_cell(row, 2, item.test_case.name)
+            if item.error_info is not None:
+                self.__set_cell(row, 3, item.error_info.message)
+                self.__set_cell(row, 4, os.path.split(item.error_info.filename)[1])
+                self.__set_cell(row, 5, str(item.error_info.line_number))
+                self.__set_cell(row, 6, item.error_info.function)
+                self.__set_cell(row, 7, item.error_info.author)
 
     def get_selected_test_case(self) -> Union[TestCase, None]:
         indexes = self.selectedIndexes()
         if len(indexes) == 0:
             return None
         index = indexes[0].row()
-        if index < 0 or index >= len(self.__data):
-            return None
-        return self.__data[index]
+        return self.__data.get_item_by_index(index)
 
     def __set_cell(self, row: int, col: int, value: str) -> None:
         cell = QTableWidgetItem()
@@ -82,6 +77,7 @@ class AnalysisTestResultDialogUI(object):
         self.path_title = QLabel(u"测试输出目录", parent=owner)
         self.path_input = QLineEdit(parent=owner)
         self.path_input.setFixedHeight(22)
+        self.path_input.setText(r"E:\gap\bin\x64Q_Debug\Logs\2022.12.14(11h10m24s)")
         self.analysis = QPushButton(parent=owner)
         self.analysis.setText(u"分析")
         self.analysis.setFixedSize(QSize(60, 24))
@@ -125,7 +121,7 @@ class AnalysisTestResultDialog(DialogBase):
         directory = self.__ui.path_input.text()
         if not os.path.isdir(directory):
             return
-        result = analysis_test_results(directory)
+        result = parse_test_results(directory)
         self.__ui.result.load_data(result)
 
     @Slot()
@@ -134,6 +130,6 @@ class AnalysisTestResultDialog(DialogBase):
         if test_case is None:
             self.__ui.directory.set_path(None)
             self.__ui.open.set_path(None)
-        else:
-            self.__ui.directory.set_path(test_case.directory)
-            self.__ui.open.set_path(test_case.directory)
+        # else:
+        #     self.__ui.directory.set_path(test_case.directory)
+        #     self.__ui.open.set_path(test_case.directory)
