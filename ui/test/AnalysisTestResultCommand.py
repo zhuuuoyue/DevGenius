@@ -2,7 +2,7 @@
 
 from ..command import ICommand
 
-from .AnalysisTestResultDialog import AnalysisTestResultDialog
+from .TestWindow import TestWindow
 
 from ..WindowManager import get_main_window
 
@@ -13,5 +13,6 @@ class AnalysisTestResultCommand(ICommand):
         super().__init__()
 
     def execute(self, *args, **kwargs) -> None:
-        dialog = AnalysisTestResultDialog(parent=get_main_window())
-        dialog.exec()
+        if True:
+            win = TestWindow(parent=get_main_window())
+            win.show()

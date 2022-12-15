@@ -88,6 +88,9 @@ class TestCaseRunningResultCollection(object):
     def __init__(self):
         self.__list: list[TestCaseRunningResult] = []
         self.__map: dict[str, TestCaseRunningResult] = {}
+        self.output_directory: Union[str, None] = None
+        self.ini_filename: Union[str, None] = None
+        self.html_filename: Union[str, None] = None
 
     def add_item(self, item: TestCaseRunningResult) -> bool:
         if not isinstance(item, TestCaseRunningResult):

@@ -8,7 +8,7 @@ from .Packaging import PackagingCommand
 from .ArchiveManagement import ArchiveManagementCommand
 from .CreateFiles import CreateFilesCommand
 from .EnvironmentManagement import SwitchEnvironmentCommand
-from .AnalysisTestResult import AnalysisTestResultCommand
+from .test import AnalysisTestResultCommand
 from .Preferences import PreferencesCommand
 from .About import AboutCommand
 
