@@ -12,63 +12,7 @@ from bussiness.TestUtils import parse_test_results
 from components import DialogBase, PathLabel, DirectoryPathValidator
 
 from ..widgets import OpenDirectoryButton
-
-
-class TestResultTable(QTableWidget):
-
-    __columns: list[str] = [u"结果", u"分组", u"文件名", u"错误描述", u"出错文件", u"行号", u"出错函数", u"作者"]
-
-    selectedTestCaseChanged = Signal()
-
-    def __init__(self, parent: Optional[QWidget] = None):
-        super().__init__(parent=parent)
-        self.setColumnCount(len(TestResultTable.__columns))
-        self.setHorizontalHeaderLabels(TestResultTable.__columns)
-        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-
-        self.__data: TestCaseRunningResultCollection = TestCaseRunningResultCollection()
-
-        self.pressed.connect(self.__on_selection_changed)
-
-    def __remove_all_rows(self) -> None:
-        while self.rowCount():
-            self.removeRow(0)
-        self.__data = []
-
-    def load_data(self, items: TestCaseRunningResultCollection) -> None:
-        self.__remove_all_rows()
-        self.__data = items
-        self.setRowCount(self.__data.get_count())
-        for row, item in enumerate(self.__data.data):
-            if item.test_case is None:
-                continue
-            self.__set_cell(row, 0, item.status)
-            self.__set_cell(row, 1, item.test_case.group)
-            self.__set_cell(row, 2, item.test_case.name)
-            if item.error_info is not None:
-                self.__set_cell(row, 3, item.error_info.message)
-                self.__set_cell(row, 4, os.path.split(item.error_info.filename)[1])
-                self.__set_cell(row, 5, str(item.error_info.line_number))
-                self.__set_cell(row, 6, item.error_info.function)
-                self.__set_cell(row, 7, item.error_info.author)
-
-    def get_selected_test_case(self) -> Union[TestCase, None]:
-        indexes = self.selectedIndexes()
-        if len(indexes) == 0:
-            return None
-        index = indexes[0].row()
-        return self.__data.get_item_by_index(index)
-
-    def __set_cell(self, row: int, col: int, value: str) -> None:
-        cell = QTableWidgetItem()
-        cell.setText(value)
-        cell.setFlags(cell.flags() & ~Qt.ItemFlag.ItemIsEditable)
-        self.setItem(row, col, cell)
-
-    @Slot()
-    def __on_selection_changed(self) -> None:
-        self.selectedTestCaseChanged.emit()
+from .TestResultTable import TestResultTable
 
 
 class AnalysisTestResultDialogUI(object):

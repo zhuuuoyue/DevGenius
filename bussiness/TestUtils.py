@@ -196,4 +196,7 @@ def parse_test_results(test_output_dir: str) -> TestCaseRunningResultCollection:
         if not os.path.isdir(path):
             continue
         parse_test_result(path, result)
+    result.output_directory = test_output_dir
+    result.ini_filename = ini
+    result.html_filename = html
     return result
