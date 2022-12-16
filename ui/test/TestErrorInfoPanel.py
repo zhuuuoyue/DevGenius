@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import os
 from typing import Optional
 
 from PySide6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLineEdit
@@ -49,8 +50,15 @@ class TestErrorInfoPanel(QGroupBox):
 
     def set_data(self, data: Optional[TestCaseRunningError]) -> None:
         if isinstance(data, TestCaseRunningError):
-            if data.name is not None:
-                self.__ui.name.setText(data.name)
+            unset = u""
+            self.__ui.name.setText(unset if data.name is None else data.name)
+            self.__ui.task_id.setText(unset if data.task_id is None else str(data.task_id))
+            self.__ui.filename.setText(unset if data.filename is None else os.path.split(data.filename)[-1])
+            self.__ui.line_number.setText(unset if data.line_number is None else str(data.line_number))
+            self.__ui.function.setText(unset if data.function is None else data.function)
+            self.__ui.message.setText(unset if data.message is None else data.message)
+            self.__ui.author.setText(unset if data.author is None else data.author)
+            self.__ui.date.setText(unset if data.date is None else data.date.isoformat())
         else:
             self.clean()
 
