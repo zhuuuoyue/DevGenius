@@ -3,10 +3,10 @@
 from ..command import ICommand
 from ..WindowManager import get_main_window
 
-from .PreferencesDialog import PreferencesDialog
+from .SettingDialog import PreferencesDialog
 
 
-class PreferencesCommand(ICommand):
+class SettingCommand(ICommand):
 
     def __init__(self):
         super().__init__()

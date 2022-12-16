@@ -9,7 +9,7 @@ from .ArchiveManagement import ArchiveManagementCommand
 from .CreateFiles import CreateFilesCommand
 from .EnvironmentManagement import SwitchEnvironmentCommand
 from .test import AnalysisTestResultCommand
-from .Preferences import PreferencesCommand
+from .setting import SettingCommand
 from .About import AboutCommand
 
 
@@ -22,7 +22,7 @@ def initialize_commands():
     cmd_mgr.register("create_files", CreateFilesCommand)
     cmd_mgr.register("environment", SwitchEnvironmentCommand)
     cmd_mgr.register("analysis_test_result", AnalysisTestResultCommand)
-    cmd_mgr.register("preferences", PreferencesCommand)
+    cmd_mgr.register("preferences", SettingCommand)
     cmd_mgr.register("about", AboutCommand)
 
 
