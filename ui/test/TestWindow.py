@@ -35,18 +35,21 @@ class TestWindowCentralWidget(WidgetBase):
 
         self.left_layout = QVBoxLayout()
         self.left_layout.setSpacing(8)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_layout.addWidget(self.running_info_panel)
         self.left_layout.addWidget(self.result_table)
 
         self.right_layout = QVBoxLayout()
-        self.right_layout.setSpacing(12)
-        self.right_layout.setContentsMargins(4, 4, 4, 4)
+        self.right_layout.setSpacing(8)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.addWidget(self.error_info_panel)
         self.right_layout.addWidget(self.case_info_panel)
         self.right_bottom_spacer = QSpacerItem(0, 0, vData=QSizePolicy.Policy.Expanding)
         self.right_layout.addSpacerItem(self.right_bottom_spacer)
 
         self.main_layout = QHBoxLayout()
+        self.main_layout.setSpacing(8)
+        self.main_layout.setContentsMargins(8, 8, 8, 8)
         self.main_layout.addLayout(self.left_layout)
         self.main_layout.addLayout(self.right_layout)
 
@@ -57,7 +60,7 @@ class TestWindowUI(object):
 
     def __init__(self, win: QMainWindow):
         win.setWindowTitle(u"测试")
-        win.setMinimumSize(QSize(1200, 860))
+        win.setMinimumSize(QSize(1200, 700))
         win.move(0, 0)
 
         self.menu_bar = win.menuBar()
@@ -92,9 +95,11 @@ class TestWindow(WindowBase):
     def __init__(self, parent: Optional[QWidget] = None, *args, **kwargs):
         super().__init__(parent=parent)
         self.__ui = TestWindowUI(self)
-        self.__ui.central_widget.running_info_panel.set_data(TestCaseRunningResultCollection())
 
         self.__ui.open_action.triggered.connect(self.__on_open_clicked)
+        self.__ui.close_action.triggered.connect(self.__on_close_clicked)
+        self.__ui.exit_action.triggered.connect(self.__on_exit_clicked)
+
         self.__ui.adjust_column_width_action.triggered.connect(self.__on_adjust_table_column_width_clicked)
 
         self.__ui.central_widget.result_table.selectedTestCaseChanged.connect(self.__on_selected_test_case_changed)
@@ -112,6 +117,17 @@ class TestWindow(WindowBase):
         result_collection = parse_test_results(test_output_dir=test_output_dir)
         self.__ui.central_widget.result_table.load_data(result_collection)
         self.__ui.central_widget.running_info_panel.set_data(result_collection)
+
+    @Slot(bool)
+    def __on_close_clicked(self) -> None:
+        self.__ui.central_widget.result_table.load_data(TestCaseRunningResultCollection())
+        self.__ui.central_widget.error_info_panel.set_data(None)
+        self.__ui.central_widget.case_info_panel.set_data(None)
+        self.__ui.central_widget.running_info_panel.set_data(None)
+
+    @Slot(bool)
+    def __on_exit_clicked(self) -> None:
+        self.close()
 
     @Slot()
     def __on_adjust_table_column_width_clicked(self) -> None:

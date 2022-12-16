@@ -43,7 +43,10 @@ class TestRunningInfoPanel(QGroupBox):
 
     def set_data(self, data: Optional[TestCaseRunningResultCollection]) -> None:
         if data is None:
-            return
-        self.__ui.output_directory.set_path(data.output_directory)
-        self.__ui.ini_filename.set_path(data.ini_filename)
-        self.__ui.html_filename.set_path(data.html_filename)
+            self.__ui.output_directory.set_path(None)
+            self.__ui.ini_filename.set_path(None)
+            self.__ui.html_filename.set_path(None)
+        else:
+            self.__ui.output_directory.set_path(data.output_directory)
+            self.__ui.ini_filename.set_path(data.ini_filename)
+            self.__ui.html_filename.set_path(data.html_filename)
