@@ -7,22 +7,9 @@ from PySide6.QtCore import QSize, Slot
 from PySide6.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QCheckBox, QLabel, QSpacerItem,
                                QSizePolicy, QTabWidget, QTextEdit, QPushButton, QMessageBox)
 
-from bussiness import CreationUtils
+from utils import save_file_as_utf8_bom
+from bussiness.creation import get_header_content, get_source_content
 from components import DialogBase
-
-
-__header_template__: str = """// Owner: 
-// Co-Owner: 
-
-#pragma once
-
-"""
-
-__source_template__: str = """// Owner: 
-// Co-Owner: 
-
-#include ".h"
-"""
 
 
 def create_title(title: str, parent: Optional[QWidget] = None) -> QLabel:
@@ -43,42 +30,40 @@ class CreateFilesDialogUI(object):
 
     def __init__(self, owner: QWidget):
         self.folder_layout = QHBoxLayout()
-        self.folder_title = create_title(u"Destination", parent=owner)
+        self.folder_title = create_title(u"目标文件夹", parent=owner)
         self.folder_layout.addWidget(self.folder_title)
         self.folder = QLineEdit(parent=owner)
         self.folder_layout.addWidget(self.folder)
 
         self.basename_layout = QHBoxLayout()
-        self.basename_title = create_title(u"Base Name", parent=owner)
+        self.basename_title = create_title(u"文件名", parent=owner)
         self.basename_layout.addWidget(self.basename_title)
         self.basename = QLineEdit(parent=owner)
         self.basename_layout.addWidget(self.basename)
 
         self.extension_layout = QHBoxLayout()
-        self.extension_title = create_title(u"File Types", parent=owner)
+        self.extension_title = create_title(u"文件类型", parent=owner)
         self.extension_layout.addWidget(self.extension_title)
-        self.header = QCheckBox(text=u"Header File (*.h)", parent=owner)
-        # self.header.setChecked(False)
+        self.header = QCheckBox(text=u"头文件 (*.h)", parent=owner)
         self.extension_layout.addWidget(self.header)
-        self.source = QCheckBox(text=u"Source File (*.cpp)", parent=owner)
-        # self.source.setChecked(False)
+        self.source = QCheckBox(text=u"源文件 (*.cpp)", parent=owner)
         self.extension_layout.addWidget(self.source)
         self.extension_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.extension_layout.addSpacerItem(self.extension_spacer)
 
         self.preview = QTabWidget(parent=owner)
-        self.header_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=__header_template__)
-        self.preview.addTab(self.header_preview, u"Header")
-        self.source_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=__source_template__)
-        self.preview.addTab(self.source_preview, u"Source")
+        self.header_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=get_header_content())
+        self.preview.addTab(self.header_preview, u"头文件")
+        self.source_preview = CreateFilesDialogUI.create_text_editor(parent=owner, content=get_source_content())
+        self.preview.addTab(self.source_preview, u"源文件")
 
         self.button_layout = QHBoxLayout()
         self.spacer_before_create = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.button_layout.addSpacerItem(self.spacer_before_create)
-        self.create = QPushButton(text=u"Create", parent=owner)
+        self.create = QPushButton(text=u"创建", parent=owner)
         self.create.setEnabled(False)
         self.button_layout.addWidget(self.create)
-        self.cancel = QPushButton(text=u"Cancel", parent=owner)
+        self.cancel = QPushButton(text=u"取消", parent=owner)
         self.button_layout.addWidget(self.cancel)
         self.spacer_after_cancel = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
         self.button_layout.addSpacerItem(self.spacer_after_cancel)
@@ -107,14 +92,14 @@ class CreateFilesDialog(DialogBase):
 
     def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent=parent, dialog_id="46d861c9-a8b7-440f-8a3f-929288551787")
-        self.setWindowTitle(u"Create Files")
+        self.setWindowTitle(u"创建文件")
         self.setMinimumSize(QSize(600, 400))
         self.ui = CreateFilesDialogUI(self)
 
         self.__load_data(CreateFilesDialog.__cache)
 
         self.ui.folder.textChanged.connect(self.__on_path_changed)
-        self.ui.basename.textChanged.connect(self.__on_path_changed)
+        self.ui.basename.textChanged.connect(self.__on_basename_changed)
         self.ui.header.stateChanged.connect(self.__on_file_types_changed)
         self.ui.source.stateChanged.connect(self.__on_file_types_changed)
         self.ui.create.clicked.connect(self.__on_create_clicked)
@@ -139,6 +124,16 @@ class CreateFilesDialog(DialogBase):
         self.ui.create.setEnabled(enabled)
 
     @Slot()
+    def __on_basename_changed(self) -> None:
+        header_basename = self.ui.basename.text()
+        if 0 == len(header_basename):
+            source = get_source_content()
+        else:
+            source = get_source_content(header_filename=f"{header_basename}.h")
+        self.ui.source_preview.setPlainText(source)
+        self.__update_create_button_status()
+
+    @Slot()
     def __on_path_changed(self) -> None:
         self.__save_data()
         self.__update_create_button_status()
@@ -153,25 +148,25 @@ class CreateFilesDialog(DialogBase):
         folder, basename = self.__get_paths()
         filenames: list[str] = []
         if self.ui.header.isChecked():
-            path = f"{folder}\\{basename}.h"
+            path = os.path.join(folder, f"{basename}.h")
             filenames.append(path)
             content = self.ui.header_preview.toPlainText()
-            CreationUtils.create_file(path, content)
+            save_file_as_utf8_bom(path, content)
         if self.ui.source.isChecked():
-            path = f"{folder}\\{basename}.cpp"
+            path = os.path.join(folder, f"{basename}.cpp")
             filenames.append(path)
             content = self.ui.source_preview.toPlainText()
-            CreationUtils.create_file(path, content)
+            save_file_as_utf8_bom(path, content)
         total: int = len(filenames)
         done: int = 0
         for filename in filenames:
             if os.path.isfile(filename):
                 done += 1
         if total == done:
-            text = f"{total} file(s) has been created"
+            text = f"已创建 {total} 个文件"
         else:
-            text = f"{total} file(s) has been created, but {total - done} failed."
-        QMessageBox.information(self, "Create Files", text, QMessageBox.StandardButton.Ok)
+            text = f"希望创建 {total} 个文件，但只创建了 {done} 个文件，有 {total - done} 个文件创建失败"
+        QMessageBox.information(self, "创建文件完成", text, QMessageBox.StandardButton.Ok)
 
     @Slot()
     def __on_cancel_clicked(self) -> None:
