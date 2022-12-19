@@ -11,6 +11,7 @@ from .EnvironmentManagement import SwitchEnvironmentCommand
 from .test import AnalysisTestResultCommand
 from .setting import SettingCommand
 from .About import AboutCommand
+from .other import AlwaysOnTopCommand
 
 
 def initialize_commands():
@@ -24,6 +25,7 @@ def initialize_commands():
     cmd_mgr.register("analysis_test_result", AnalysisTestResultCommand)
     cmd_mgr.register("preferences", SettingCommand)
     cmd_mgr.register("about", AboutCommand)
+    cmd_mgr.register("always_on_top", AlwaysOnTopCommand)
 
 
 def initialize():
