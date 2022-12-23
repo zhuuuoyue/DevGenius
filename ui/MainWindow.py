@@ -1,65 +1,100 @@
 # coding: utf-8
 
-import json
-import os
+from typing import Union, Optional
 
-from PySide6.QtCore import Slot, QPoint
-from PySide6.QtGui import QResizeEvent, QMoveEvent
-from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSpacerItem, QSizePolicy
+from PySide6.QtCore import Slot, Signal, QPoint, Qt
+from PySide6.QtGui import QResizeEvent, QMoveEvent, QAction
+from PySide6.QtWidgets import QMainWindow, QWidget, QMenu, QMenuBar
 
-from components import DialogBase, ImageButton
+from components import DialogBase
 from .command import get_command_manager
 from .WindowManager import set_main_window
 
 
-class MenuData(object):
+class MenuItem(object):
 
-    def __init__(self, menu_id: str, name: str, icon: str, tooltip: str) -> None:
-        self.menu_id = menu_id
-        self.name = name
-        self.icon = icon
-        self.tooltip = tooltip
+    def __init__(self, menu_id: str, name: str, tooltip: Optional[str] = None, checked: Optional[bool] = None):
+        self.menu_id: str = menu_id
+        self.name: str = name
+        self.tooltip: Union[str, None] = tooltip
+        self.checked: Union[bool, None] = checked
 
 
-def load_menu_configuration() -> list[MenuData]:
-    with open(f"{os.getcwd()}\\configs\\main_window.json", encoding="utf-8") as fp:
-        data = json.load(fp)
-        configs: list[MenuData] = [MenuData(item["id"], item["name"], item["icon"], item["tooltip"]) for item in data]
-    return configs
+class MenuGroup(object):
+
+    def __init__(self, name: str, items: list[MenuItem]):
+        self.name: str = name
+        self.items: list[MenuItem] = items
+
+
+class MenuAction(QAction):
+
+    clicked = Signal(str)
+
+    def __init__(self, menu_id: str, text: str, parent: QWidget):
+        super().__init__(text=text, parent=parent)
+        self.__id: str = menu_id
+        super().triggered.connect(self.__on_triggered)
+
+    @Slot()
+    def __on_triggered(self) -> None:
+        self.clicked.emit(self.__id)
 
 
 class MainWindow(QMainWindow):
 
+    menus: list[MenuGroup] = [
+        MenuGroup(u"项目", [
+            MenuItem(u"project", u"仓库管理")
+        ]),
+        MenuGroup(u"任务", [
+            MenuItem(u"task", u"任务管理"),
+            MenuItem(u"packaging", u"软件打包"),
+            MenuItem(u"archive", u"软件包管理")
+        ]),
+        MenuGroup(u"测试", [
+            MenuItem(u"analysis_test_result", u"测试分析")
+        ]),
+        MenuGroup(u"工具", [
+            MenuItem(u"create_files", u"创建文件"),
+            MenuItem(u"environment", u"环境切换")
+        ]),
+        MenuGroup(u"其他", [
+            MenuItem(u"always_on_top", u"窗口置顶", checked=False),
+            MenuItem(u"preferences", u"设置"),
+            MenuItem(u"about", u"关于"),
+        ]),
+    ]
+
     def __init__(self):
         super().__init__(None)
         self.move(0, 0)
+        self.setMinimumWidth(320)
+        self.setFixedHeight(22)
         self.setWindowTitle(u"开发精灵 - 桌面版")
-        self.centralWidget = QWidget(self)
-        self.setCentralWidget(self.centralWidget)
 
-        self.menus: list[ImageButton] = []
-        self.menu_layout = QHBoxLayout()
-        menus = load_menu_configuration()
-        for menu in menus:
-            button = ImageButton(menu.menu_id, menu.name, menu.icon, menu.tooltip, parent=self)
-            button.clicked.connect(self._on_menu_triggered)
-            self.menus.append(button)
-            self.menu_layout.addWidget(button)
-        self.menu_spacer = QSpacerItem(0, 0, hData=QSizePolicy.Policy.Expanding)
-        self.menu_layout.addSpacerItem(self.menu_spacer)
-
-        self.main_layout = QVBoxLayout()
-        self.main_layout.addLayout(self.menu_layout)
-        self.main_spacer = QSpacerItem(0, 0, vData=QSizePolicy.Policy.Expanding)
-        self.main_layout.addSpacerItem(self.main_spacer)
-
-        self.centralWidget.setLayout(self.main_layout)
+        self.menu_bar: QMenuBar = self.menuBar()
+        for group in MainWindow.menus:
+            menu_group: QMenu = self.menu_bar.addMenu(group.name)
+            for item in group.items:
+                menu_action = MenuAction(menu_id=item.menu_id, text=item.name, parent=menu_group)
+                if isinstance(item.checked, bool):
+                    menu_action.setCheckable(True)
+                    menu_action.setChecked(item.checked)
+                menu_action.clicked.connect(self.__on_menu_triggered)
+                menu_group.addAction(menu_action)
 
         set_main_window(self)
 
     @Slot(str)
-    def _on_menu_triggered(self, menu_id: str):
-        get_command_manager().run(menu_id)
+    def __on_menu_triggered(self, menu_id: str):
+        sender = self.sender()
+        if isinstance(sender, MenuAction):
+            if sender.isCheckable():
+                checked = sender.isChecked()
+                get_command_manager().run(menu_id, checked=checked)
+            else:
+                get_command_manager().run(menu_id)
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         self.__update_dialog_position()

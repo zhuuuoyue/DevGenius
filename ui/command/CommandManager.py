@@ -22,9 +22,9 @@ class CommandManager(object):
     def register(self, name: str, command):
         self.commands[name] = CommandCreator(command)
 
-    def run(self, name: str) -> None:
+    def run(self, name: str, *args, **kwargs) -> None:
         if name in self.commands:
-            self.commands[name].create().execute()
+            self.commands[name].create().execute(*args, **kwargs)
 
 
 _command_manager = CommandManager()
